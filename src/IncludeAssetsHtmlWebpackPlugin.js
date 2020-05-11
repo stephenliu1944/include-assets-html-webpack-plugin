@@ -1,3 +1,4 @@
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 var MergeIncludePlugin = require('webpack-merge-and-include-globally');
 
 function resolveChunk(chunk = '') {
@@ -58,40 +59,39 @@ function transformToMergeIncludePluginOptions(options) {
     };
 }
 
-function MyWebpackPlugin(options = [], htmlWebpackPlugin) {
+function IncludeAssetsHtmlWebpackPlugin(options = []) {
     // TODO: validateOptions()
     this.options = convertOptions(options);
-    this.htmlWebpackPlugin = htmlWebpackPlugin;
     this.mergeIncludePlugin = new MergeIncludePlugin(transformToMergeIncludePluginOptions(this.options));
 }
 
-MyWebpackPlugin.prototype.apply = function(compiler) {
+IncludeAssetsHtmlWebpackPlugin.prototype.apply = function(compiler) {
     this.applyMergeIncludePlugin(compiler);
     
-    compiler.hooks.afterPlugins.tap(MyWebpackPlugin.name, this.afterPlugins.bind(this));
+    compiler.hooks.afterPlugins.tap(IncludeAssetsHtmlWebpackPlugin.name, this.afterPlugins.bind(this));
 };
 
-MyWebpackPlugin.prototype.applyMergeIncludePlugin = function(compiler) {
+IncludeAssetsHtmlWebpackPlugin.prototype.applyMergeIncludePlugin = function(compiler) {
     this.mergeIncludePlugin.apply(compiler);
 };
 
-MyWebpackPlugin.prototype.afterPlugins = function(compiler) {
-    compiler.hooks.compilation.tap(MyWebpackPlugin.name, compilation => {
+IncludeAssetsHtmlWebpackPlugin.prototype.afterPlugins = function(compiler) {
+    compiler.hooks.compilation.tap(IncludeAssetsHtmlWebpackPlugin.name, compilation => {
         var hook;
         
-        if (this.htmlWebpackPlugin && this.htmlWebpackPlugin.getHooks) {
+        if (HtmlWebpackPlugin && HtmlWebpackPlugin.getHooks) {
             // HtmlWebpackPlugin v4
-            hook = this.htmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration;
+            hook = HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration;
         } else {
             // HtmlWebpackPlugin v3
             hook = compilation.hooks.htmlWebpackPluginBeforeHtmlGeneration;     // Event: html-webpack-plugin-before-html-generation
         }
 
-        hook.tapAsync(MyWebpackPlugin.name, this.includeAssets.bind(this));
+        hook.tapAsync(IncludeAssetsHtmlWebpackPlugin.name, this.includeAssets.bind(this));
     });
 };
 
-MyWebpackPlugin.prototype.includeAssets = function(data, cb) {
+IncludeAssetsHtmlWebpackPlugin.prototype.includeAssets = function(data, cb) {
     var { js = [], css = [], publicPath = '' } = data.assets;
         
     try {
@@ -111,4 +111,4 @@ MyWebpackPlugin.prototype.includeAssets = function(data, cb) {
     }
 };
 
-module.exports = MyWebpackPlugin;
+module.exports = IncludeAssetsHtmlWebpackPlugin;
