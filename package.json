@@ -1,6 +1,6 @@
 {
   "name": "include-assets-html-webpack-plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Include extra file into HtmlWebpackPlugin template.",
   "main": "src/index.js",
   "license": "MIT",

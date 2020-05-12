@@ -14,15 +14,17 @@ function resolveChunk(chunk = '') {
 
     // 引用模块默认路径
     var pkg = require(chunk + '/package.json');
-    var source = pkg.browser || pkg.module || pkg.main;
+    var source = pkg.browser || pkg.module || pkg.main || 'index.js';
+    var index = 0;
     
-    if (source.startsWith('./')) {
-        source = source.substring(2);
-    } else if (!source.startsWith('/')) {
-        source = '/' + source;
+    if (source.startsWith('/')) {
+        index = 1;
+    } else if (source.startsWith('./')) {
+        index = 2;
     }
+    source = source.substring(index);
     
-    return './node_modules/' + chunk + source;
+    return `./node_modules/${chunk}/${source}`;
 }
 
 function convertOptions(options) {
