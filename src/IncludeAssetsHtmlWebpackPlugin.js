@@ -2,12 +2,17 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var MergeIncludePlugin = require('webpack-merge-and-include-globally');
 
 function resolveChunk(chunk = '') {
-    // 引用的是相对路径或绝对路径
-    if (chunk.startsWith('.') || chunk.startsWith('/')) {
+    // 引用的是绝对路径或相对路径
+    if (chunk.startsWith('/') || chunk.startsWith('./')) {
         return chunk;
     } 
 
-    // 引用的是模块
+    // 引用模块指定路径
+    if (chunk.includes('/')) {
+        return './node_modules/' + chunk;
+    }
+
+    // 引用模块默认路径
     var pkg = require(chunk + '/package.json');
     var source = pkg.browser || pkg.module || pkg.main;
     
@@ -17,7 +22,7 @@ function resolveChunk(chunk = '') {
         source = '/' + source;
     }
     
-    return 'node_modules/' + chunk + source;
+    return './node_modules/' + chunk + source;
 }
 
 function convertOptions(options) {

@@ -18,7 +18,7 @@ plugins: [
       chunks: ['systemjs']
   }, {
       filename: '/js/systemjs2.js',
-      chunks: ['node_modules/systemjs/dist/system.js']
+      chunks: ['./node_modules/systemjs/dist/system.js']
   }])
 ]
 ```
